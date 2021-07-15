@@ -2,7 +2,6 @@
 
 #include <exception>
 
-
 // Window parameters
 #define WINDOW_WIDTH 640
 #define	WINDOW_HEIGHT 480
@@ -23,6 +22,7 @@ private:
 
 public:
 	static GLFWwindow* window;
+
 
 	Application() = delete;
 	Application(const Application& other) = delete;

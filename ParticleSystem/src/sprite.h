@@ -1,13 +1,22 @@
 #pragma once
+#include "transform.h"
+#include "object.h"
 
-class Sprite
+#define ELEMENTS_IN_VERTEX 28
+
+class Sprite : public Object
 {
 private:
-	static const float vertices[16];
 	unsigned char* texture = nullptr;
 public:
+	static const float vertices[ELEMENTS_IN_VERTEX];
+	static const unsigned int indecies[6];
+
+	glm::vec4 color;
+
 	Sprite();
+	Sprite(const glm::vec4& color);
 	~Sprite();
 
-	static const float* GetVertices();
+	float* GetData() const;
 };

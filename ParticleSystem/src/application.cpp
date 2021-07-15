@@ -5,6 +5,8 @@
 #include "application.h"
 #include <assert.h>
 #include <iostream>
+#include "sprite.h"
+#include "renderer.h"
 
 
 GLFWwindow* Application::window = nullptr;
@@ -24,12 +26,44 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 int Application::Run()
 {
     if (int err = Initialize() != 0) return err;
-    
+  
+    Renderer renderer;
+    Sprite sprite1(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    Sprite sprite2(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+    sprite1.transform.scale *= 0.2f;
+    sprite2.transform.scale *= 0.2f;
+    sprite2.transform.position.x += 0.5f;
+    renderer.RegisterSprite(&sprite1);
+    renderer.RegisterSprite(&sprite2);
+
+
     /*** MAIN LOOP ***/
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+
+        renderer.Draw();
+        if (glfwGetKey(window, GLFW_KEY_D))
+        {
+            sprite1.transform.position.x += 0.01;
+            sprite2.transform.position.x += 0.01;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A))
+        {
+            sprite1.transform.position.x -= 0.01;
+            sprite2.transform.position.x -= 0.01;
+        }
+        if (glfwGetKey(window, GLFW_KEY_W))
+        {
+            sprite1.transform.position.y += 0.01;
+            sprite2.transform.position.y += 0.01;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S))
+        {
+            sprite1.transform.position.y -= 0.01;
+            sprite2.transform.position.y -= 0.01;
+        }
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -52,8 +86,8 @@ int Application::Initialize()
         return INITIALIZATION_ERROR;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
     if (!window)
     {

@@ -3,12 +3,14 @@
 #include <sstream>
 #include <iostream>
 #include <GL/glew.h>
+#include <iostream>
 
 ShaderProgram::ShaderProgram(const std::string& file)
 	: filepath(file)
 {
 	const ShaderProgramSource source = ParseShader(file);
 	openglID = CreateShaderProgram(source);
+	glUseProgram(openglID);
 }
 
 ShaderProgram::~ShaderProgram()
@@ -75,7 +77,7 @@ unsigned int ShaderProgram::CreateShaderProgram(ShaderProgramSource source)
 {
 	unsigned int vertexShader = CompileShader(source.VertexShaderSource, GL_VERTEX_SHADER);
 	unsigned int fragmentShader = CompileShader(source.FragmentShaderSource, GL_FRAGMENT_SHADER);
-	int ID = glCreateProgram();
+	unsigned int ID = glCreateProgram();
 	glAttachShader(ID, vertexShader);
 	glAttachShader(ID, fragmentShader);
 	glLinkProgram(ID);
@@ -110,6 +112,11 @@ void ShaderProgram::SetUniform2f(const std::string& name, float v0, float v1)
 void ShaderProgram::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	glUniform4f(GetUniformLocation(name), v0, v1, v2, v3);
+}
+
+void ShaderProgram::SetUniformMat3(const std::string& name, const glm::mat3 mat)
+{
+	glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 }
 
 void ShaderProgram::SetUniformMat4(const std::string& name, const glm::mat4 mat)

@@ -28,7 +28,10 @@ public:
 	void SetUniform1f(const std::string& name, float v0);
 	void SetUniform2f(const std::string& name, float v0, float v1);
 	void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
+	void SetUniformMat3(const std::string& name, const glm::mat3 mat);
 	void SetUniformMat4(const std::string& name, const glm::mat4 mat);
+
+	unsigned int GetID() const { return openglID; }
 
 	void Bind() const;
 	void Unbind() const;

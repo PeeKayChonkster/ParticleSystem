@@ -6,7 +6,6 @@ class Object
 private:
 public:
 	Transform transform;
-	
 	Object();
 	virtual ~Object();
 };
