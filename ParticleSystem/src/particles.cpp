@@ -1,6 +1,7 @@
 #include "particles.h"
 #include "renderer.h"
 #include <memory>
+#include "application.h"
 
 Particles::Particles(Renderer* renderer) : renderer(renderer), layer(0)
 {
@@ -37,7 +38,7 @@ void Particles::Update()
 		else
 		{
 			// add velocity to particle position
-			(*iter)->Translate((*iter)->velocity);
+			(*iter)->Translate((*iter)->velocity * Application::GetDelta());
 
 			// account for all effects
 			for (ParticleEffect* e : effects)

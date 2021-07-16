@@ -11,8 +11,6 @@ class Renderer
 {
 private:
 	GLFWwindow* window;
-	int windowWidth;
-	int windowHeight;
 	glm::mat4 projection;
 
 	unsigned int default_vb;
@@ -24,12 +22,12 @@ private:
 
 	void AssembleData();
 public:
-	Renderer() = delete;
 	Renderer(GLFWwindow* window);
 	~Renderer();
 	void RegisterParticle(const Particle* particle);
 	void UnregisterParticle(const Particle* particle);
 	void Draw();
 	void BindDefault();
+	void AdjustVieportSize(GLFWwindow* window, int width, int height);
 };
 

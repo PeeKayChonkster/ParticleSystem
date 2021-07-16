@@ -5,14 +5,12 @@
 #include "buffer_layout.h"
 #include <algorithm>
 #include "gtc/matrix_transform.hpp"
+#include "application.h"
 
 
 Renderer::Renderer(GLFWwindow* window) : window(window), default_shader("res/shaders/basic.shader")
 {
-	glfwGetWindowSize(window, &windowWidth, &windowHeight);
-	projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
-
-
+	projection = glm::ortho(0.0f, (float)Application::GetWindowWidth(), (float)Application::GetWindowHeight(), 0.0f);
 	default_shader.Bind();
 	default_shader.SetUniformMat4("projection", projection);
 
@@ -52,6 +50,7 @@ Renderer::~Renderer()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
 
 void Renderer::RegisterParticle(const Particle* particle)
 {
@@ -107,4 +106,12 @@ void Renderer::AssembleData()
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, default_ib);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, particles.size() * sizeof(unsigned int) * 6, &dataInd[0], GL_DYNAMIC_DRAW);
 	}
+}
+
+void Renderer::AdjustVieportSize(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+	projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
+	default_shader.Bind();
+	default_shader.SetUniformMat4("projection", projection);
 }

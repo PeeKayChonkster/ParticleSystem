@@ -5,6 +5,15 @@
 #include <GL/glew.h>
 #include <iostream>
 
+ShaderProgram::ShaderProgram(const ShaderProgram& other) : filepath(other.filepath), openglID(other.openglID), uniformCache(other.uniformCache)
+{
+}
+
+ShaderProgram ShaderProgram::operator=(const ShaderProgram& other)
+{
+	return ShaderProgram(other);
+}
+
 ShaderProgram::ShaderProgram(const std::string& file)
 	: filepath(file)
 {

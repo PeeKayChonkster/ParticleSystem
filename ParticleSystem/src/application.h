@@ -3,6 +3,7 @@
 #include <exception>
 #include <vector>
 #include <string>
+#include <chrono>
 
 
 // Window parameters
@@ -17,12 +18,11 @@
 
 struct GLFWwindow;
 class Object;
+class Renderer;
 
 class Application
 {
 private:
-	static float delta;
-
 	static int windowWidth;
 	static int windowHeight;
 	static std::string windowTitle;
@@ -30,9 +30,13 @@ private:
 	static int Initialize(int windowWidth, int windowHeight, std::string title);
 	static void InvokeCallbacks();
 	static void RefreshDelta();
+
+	static float delta;
+	static std::chrono::time_point<std::chrono::steady_clock> timePoint1, timePoint2;
+
 public:
 	static GLFWwindow* window;
-
+	static Renderer* renderer;
 
 	Application() = delete;
 	Application(const Application& other) = delete;
@@ -40,7 +44,13 @@ public:
 
 	static int Run(int windowWidth, int windowHeight, std::string title);
 
+	static inline void SetWindowSize(int width, int height) {
+		windowWidth = width;
+		windowHeight = height;
+	}
+
 	static inline int GetWindowWidth() { return windowWidth; }
 	static inline int GetWindowHeight() { return windowHeight; }
+	static inline float GetDelta() { return delta; }
 };
 

@@ -31,7 +31,6 @@ Particle::Particle(const glm::vec2& position): Object(position), color(glm::vec4
 
 Particle::Particle(const glm::vec2& position, const glm::vec4& color) : Object(position), color(color), zDepth(0.0f), layer(0)
 {
-	transform.position = position;
 }
 
 Particle::Particle(const Transform& transform, const glm::vec4& color) : Object(transform), color(color), zDepth(0.0f), layer(0)

@@ -21,6 +21,8 @@ private:
 	unsigned int CompileShader(const std::string& source, unsigned int type);
 	unsigned int GetUniformLocation(const std::string& name);
 public:
+	ShaderProgram(const ShaderProgram& other);
+	ShaderProgram operator=(const ShaderProgram& other);
 	ShaderProgram(const std::string& file);
 	~ShaderProgram();
 	
