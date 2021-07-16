@@ -1,15 +1,22 @@
 #define GLFW_INCLUDE_NONE
 #define GLEW_STATIC
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
+
+#include "renderer.h"
 #include "application.h"
 #include <assert.h>
 #include <iostream>
-#include "sprite.h"
-#include "renderer.h"
+#include "particles.h"
+#include "object.h"
+#include "particle_force.h"
+#include "tools.h"
+
 
 
 GLFWwindow* Application::window = nullptr;
+int Application::windowWidth = 0;
+int Application::windowHeight = 0;
+std::string Application::windowTitle = "";
+
 
 /** Callbacks **/
 void ErrorCallback(int error, const char* description)
@@ -23,47 +30,56 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-int Application::Run()
+int Application::Run(int windowWidth, int windowHeight, std::string title)
 {
-    if (int err = Initialize() != 0) return err;
+    if (int err = Initialize(windowWidth, windowHeight, title) != 0) return err;
   
-    Renderer renderer;
-    Sprite sprite1(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-    Sprite sprite2(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-    sprite1.transform.scale *= 0.2f;
-    sprite2.transform.scale *= 0.2f;
-    sprite2.transform.position.x += 0.5f;
-    renderer.RegisterSprite(&sprite1);
-    renderer.RegisterSprite(&sprite2);
+    Renderer renderer(window);
+    Particles particles(&renderer);
 
+    double mouseX, mouseY;
+
+    Transform transform;
+    transform.scale = glm::vec2(5.0f);
+
+    glm::vec4 color1(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 color2(0.0f, 1.0f, 0.0f, 1.0f);
+
+    ParticleForce force(glm::vec2(0.0f, 0.01f));
+
+    particles.AddEffect(reinterpret_cast<ParticleEffect*>(&force));
 
     /*** MAIN LOOP ***/
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+        {
+            transform.position = glm::vec2(mouseX, mouseY);
+            particles.SetLayer(-1);
+            particles.CreateParticle(transform, color1);
+        }
+        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+        {
+            transform.position = glm::vec2(mouseX, mouseY);
+            particles.SetLayer(1);
+            particles.CreateParticle(transform, color2);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
+            color1 = Tools::RandomColor(false);
+            color2 = Tools::RandomColor(false);
+        }
+
+        particles.Update();
 
         renderer.Draw();
-        if (glfwGetKey(window, GLFW_KEY_D))
-        {
-            sprite1.transform.position.x += 0.01;
-            sprite2.transform.position.x += 0.01;
-        }
-        if (glfwGetKey(window, GLFW_KEY_A))
-        {
-            sprite1.transform.position.x -= 0.01;
-            sprite2.transform.position.x -= 0.01;
-        }
-        if (glfwGetKey(window, GLFW_KEY_W))
-        {
-            sprite1.transform.position.y += 0.01;
-            sprite2.transform.position.y += 0.01;
-        }
-        if (glfwGetKey(window, GLFW_KEY_S))
-        {
-            sprite1.transform.position.y -= 0.01;
-            sprite2.transform.position.y -= 0.01;
-        }
+
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -76,8 +92,11 @@ int Application::Run()
     return 0;
 }
 
-int Application::Initialize()
+
+int Application::Initialize(int width, int height, std::string title)
 {
+    srand(time(0));     // randomize
+
     glfwSetErrorCallback(ErrorCallback);
     if (!glfwInit())
     {
@@ -86,9 +105,14 @@ int Application::Initialize()
         return INITIALIZATION_ERROR;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
+
+    windowWidth = width;
+    windowHeight = height;
+    windowTitle = title;
+
+    window = glfwCreateWindow(windowWidth, windowHeight, windowTitle.c_str(), NULL, NULL);
     if (!window)
     {
         std::cerr << "Window creation failed! Possible problems with OpenGL context creation. Make sure you have all latest GPU drivers." << std::endl;
@@ -109,6 +133,15 @@ int Application::Initialize()
         return INITIALIZATION_ERROR;
     }
 
+
     return 0;
+}
+
+void Application::InvokeCallbacks()
+{
+}
+
+void Application::RefreshDelta()
+{
 }
 

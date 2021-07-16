@@ -1,27 +1,41 @@
 #include "renderer.h"
 #include "GL/glew.h"
-#include "sprite.h"
+#include "particle.h"
 #include "transform.h"
 #include "buffer_layout.h"
+#include <algorithm>
+#include "gtc/matrix_transform.hpp"
 
 
-Renderer::Renderer() : default_shader("res/shaders/basic.shader")
+Renderer::Renderer(GLFWwindow* window) : window(window), default_shader("res/shaders/basic.shader")
 {
+	glfwGetWindowSize(window, &windowWidth, &windowHeight);
+	projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
+
+
 	default_shader.Bind();
+	default_shader.SetUniformMat4("projection", projection);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
  	glGenBuffers(1, &default_vb);
 	glGenBuffers(1, &default_ib);
 	glGenBuffers(1, &default_va);
 	glBindVertexArray(default_va);
 	glBindBuffer(GL_ARRAY_BUFFER, default_vb);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, default_ib);
+
 	BufferLayout layout;
-	glClearColor(1.0f, 0.1f, 0.1f, 1.0f);
+	//glClearColor(1.0f, 0.1f, 0.1f, 1.0f);
 	layout.Push<float>(3);	// position
 	layout.Push<float>(4); // color
 	//layout.Push<float>(2);	// uv
 	unsigned int offset = 0;
 	const auto& elements = layout.GetElements();
-	for (int i = 0; i < elements.size(); i++)
+	for (unsigned int i = 0; i < elements.size(); i++)
 	{
 		const auto &element = elements[i];
 		glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset);
@@ -39,17 +53,22 @@ Renderer::~Renderer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Renderer::RegisterSprite(const Sprite* sprite)
+void Renderer::RegisterParticle(const Particle* particle)
 {
 	// Need to use positions and textures
-	sprites.push_back(sprite);
+	particles.push_back(particle);
+}
+
+void Renderer::UnregisterParticle(const Particle* particle)
+{
+	auto iter = std::find(particles.begin(), particles.end(), particle);
+	particles.erase(iter);
 }
 
 void Renderer::Draw()
 {
-	glBindVertexArray(default_va);
 	AssembleData();
-	glDrawElements(GL_TRIANGLES, sprites.size() * 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, particles.size() * 6, GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::BindDefault()
@@ -60,28 +79,32 @@ void Renderer::BindDefault()
 
 void Renderer::AssembleData()
 {
-	static std::vector<float> dataVert;
-	static std::vector<unsigned int> dataInd;
-	dataVert.clear();
-	dataInd.clear();
-	for (int i = 0; i < sprites.size(); i++)
+	if (particles.size() > 0)
 	{
-		float* spriteData = sprites[i]->GetData();
-		for (int j = 0; j < ELEMENTS_IN_VERTEX; j++)
+		static std::vector<float> dataVert;
+		static std::vector<unsigned int> dataInd;
+		std::sort(particles.begin(), particles.end(), [](const Particle* a, const Particle* b) { return a->GetLayer() < b->GetLayer(); });
+		dataVert.clear();
+		dataInd.clear();
+
+		auto iter = particles.end();
+
+		for(unsigned int i = 0; i < particles.size(); i++)
 		{
-			dataVert.push_back(*(spriteData + j));
-		}
-		for (int i = 0; i < sprites.size(); i++)
-		{
-			for (int j = 0; j < 6; j++)
+			float* spriteData = particles[i]->GetData();
+			for (int j = 0; j < ELEMENTS_IN_VERTEX; j++)
 			{
-				dataInd.push_back(Sprite::indecies[j] + i * 4);
+				dataVert.push_back(*(spriteData + j));
+				if (j < 6)
+				{
+					dataInd.push_back(Particle::indecies[j] + i * 4);
+				}
 			}
 		}
+		glBindVertexArray(default_va);
+		//glBindBuffer(GL_ARRAY_BUFFER, default_vb);
+		glBufferData(GL_ARRAY_BUFFER, particles.size() * sizeof(float) * ELEMENTS_IN_VERTEX, &dataVert[0], GL_DYNAMIC_DRAW);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, default_ib);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, particles.size() * sizeof(unsigned int) * 6, &dataInd[0], GL_DYNAMIC_DRAW);
 	}
-	glBindVertexArray(default_va);
-	//glBindBuffer(GL_ARRAY_BUFFER, default_vb);
-	glBufferData(GL_ARRAY_BUFFER, sprites.size() * sizeof(float) * ELEMENTS_IN_VERTEX, &dataVert[0], GL_DYNAMIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, default_ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sprites.size() * sizeof(unsigned int) * 6, &dataInd[0], GL_DYNAMIC_DRAW);
 }

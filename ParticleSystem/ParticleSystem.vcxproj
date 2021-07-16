@@ -91,6 +91,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)src;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,6 +111,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)src;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,22 +151,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\particle_effect.cpp" />
+    <ClCompile Include="src\particles.cpp" />
+    <ClCompile Include="src\particle_force.cpp" />
     <ClCompile Include="src\shader_program.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\object.cpp" />
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\sprite.cpp" />
+    <ClCompile Include="src\particle.cpp" />
+    <ClCompile Include="src\tools.cpp" />
     <ClCompile Include="src\transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\particle_effect.h" />
+    <ClInclude Include="src\particles.h" />
+    <ClInclude Include="src\particle_force.h" />
     <ClInclude Include="src\shader_program.h" />
     <ClInclude Include="src\buffer_layout.h" />
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\object.h" />
     <ClInclude Include="src\application.h" />
     <ClInclude Include="src\input.h" />
-    <ClInclude Include="src\sprite.h" />
+    <ClInclude Include="src\particle.h" />
+    <ClInclude Include="src\tools.h" />
     <ClInclude Include="src\transform.h" />
   </ItemGroup>
   <ItemGroup>

@@ -11,6 +11,7 @@ public:
 	float rotation;
 
 	Transform();
+	Transform(const Transform& other);
 	Transform(glm::vec2 tr, glm::vec2 sc, float rot);
 	Transform(float tr_x, float tr_y, float sc_x, float sc_y, float rot);
 	~Transform();
