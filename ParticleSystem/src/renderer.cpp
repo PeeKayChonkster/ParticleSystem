@@ -87,7 +87,7 @@ void Renderer::AssembleData()
 		dataInd.clear();
 
 		auto iter = particles.end();
-
+	
 		for(unsigned int i = 0; i < particles.size(); i++)
 		{
 			float* spriteData = particles[i]->GetData();

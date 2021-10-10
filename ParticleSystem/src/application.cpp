@@ -51,6 +51,7 @@ int Application::Run(int windowWidth, int windowHeight, std::string title)
 
     double mouseX, mouseY;
 
+    // particles transform (for scaling)
     Transform transform;
     transform.scale = glm::vec2(50.0f);
 
